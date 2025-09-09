@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const requireAuth = async (req, res, next) => {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader || !authHeader.startsWith(process.env.JWT_SECRET)) {
         return res.status(401).json({ message: "Token not found" });
     }
     const token = authHeader.split(" ")[1];
