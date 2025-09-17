@@ -6,8 +6,9 @@ const User = require('../../../DB/Models/Auth.model');
 
 const viewdashboard = async (req , res) => {
     try{
-        if(!req.user.role === "admin")
-            return res.status(401).json({message: "You are not authorized to access this route"});
+        if(req.user.role !== 'admin'){
+            return res.status(403).json({message: "You are not authorized to update a product"});
+        }
         const [totalProperties , totalMembers , totalContacts , totalReviews , totalUsers , latestProperties , latestContacts ,latestReviews] = await Promise.all([
             Property.countDocuments(),
             TeamMember.countDocuments(),

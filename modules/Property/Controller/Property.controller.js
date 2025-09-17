@@ -75,8 +75,11 @@ const updateProperty = async (req, res) => {
   try {
     const id = req.params.id;
     if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "You are not authorized to update a product" });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to update a product" });
     }
+
     const {
       title,
       description,
@@ -90,13 +93,30 @@ const updateProperty = async (req, res) => {
       paymentMethod,
       downPayment,
       years,
+      public_id,
     } = req.body;
+
     const property = await Property.findById(id);
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
     }
+
     let images = property.image;
-    if (req.files && req.files.length > 0) {
+
+    if (public_id && req.file) {
+      await cloudinary.uploader.destroy(public_id);
+
+      const newImage = {
+        url: req.file.path,
+        public_id: req.file.filename,
+      };
+
+      images = property.image.map((img) =>
+        img.public_id === public_id ? newImage : img
+      );
+    }
+
+    else if (req.files && req.files.length > 0) {
       for (let img of property.image) {
         if (img.public_id) {
           await cloudinary.uploader.destroy(img.public_id);
@@ -127,7 +147,10 @@ const updateProperty = async (req, res) => {
       },
       { new: true }
     );
-    return res.status(200).json({ message: "Property updated successfully", data: updated });
+
+    return res
+      .status(200)
+      .json({ message: "Property updated successfully", data: updated });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
