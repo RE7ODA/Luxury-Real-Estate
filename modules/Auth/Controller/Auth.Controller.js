@@ -32,7 +32,7 @@ const login = async(req , res) =>{
         if(!ismatch){
             return res.status(400).json({message: "Email or password is incorrect"});
         }
-        let token = jwt.sign({id: emailExists._id , role: emailExists.role , email: emailExists.email , fullName: emailExists.fullName}, process.env.JWT_SECRET ,  { expiresIn: "7d" });
+        let token = jwt.sign({id: emailExists._id , role: emailExists.role , email: emailExists.email , fullName: emailExists.fullName}, process.env.JWT_SECRET ,  { expiresIn: "14d" });
         res.status(200).json({message: "User logged in successfully", token});
     }catch(err){
         res.status(500).json({message: err.message})
